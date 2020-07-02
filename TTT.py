@@ -1,14 +1,18 @@
 
 from collections import Counter
+import numpy as np
+import copy
 
 BOARD = [0]*9
+cur_turn = True
 p1_record = []
 p2_record = []
-curTurn = True
+record_path = 'record.npy'
 
 def main():
     
     board = BOARD
+    global cur_turn
     
     while True:
         block = index_in_board(board, 0)
@@ -16,13 +20,14 @@ def main():
             print('Draw')
             return 0
         
-        if curTurn:
+        if cur_turn:
             # player 1 turn
             show(board)
             board = turn(board)
             player = index_in_board(board, 1)
             if isWin(player):
-                show(board)
+                show(board) # show the final board
+                np.save(record_path, np.array(p1_record)) # save the winner decision
                 print('player1 win')
                 return 1
         else:
@@ -33,9 +38,10 @@ def main():
             board = [-i for i in board]
             if isWin(player):
                 show(board)
+                np.save(record_path, np.array(p1_record)) # save the winner decision
                 print('player2 win')
                 return 2
-        curTurn = not curTurn
+        cur_turn = not cur_turn
         
 def isWin(player):
     row = [i//3 for i in player]
@@ -57,8 +63,11 @@ def turn(board):
     pos = human_player(board)
     t = [0]*9
     t[pos] = 1
-    if curTurn:
-        p1_record.append([board,t])
+    print('test:{} and {}'.format(board,t))
+    if cur_turn:
+        p1_record.append([copy.deepcopy(board),t])
+    else:
+        p2_record.append([copy.deepcopy(board),t])
     board[pos] = 1
     return board
     
