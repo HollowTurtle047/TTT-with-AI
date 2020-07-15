@@ -1,4 +1,5 @@
 .venv/
 test*
 .vscode/
-record.npy
+models*/
+__pycache__/
