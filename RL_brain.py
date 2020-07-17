@@ -3,8 +3,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import models, layers
 import os
-np.random.seed(1)
-tf.random.set_seed(1)
+# np.random.seed(1)
+# tf.random.set_seed(1)
 
 
 class DeepQNetwork:
@@ -12,13 +12,21 @@ class DeepQNetwork:
     def _build_net(self):
         #build net
         self.q_target = models.Sequential([
-            layers.Dense(200, input_shape = (10,), activation='relu'),
+            layers.Dense(100, input_shape = (10,), activation='relu'),
+            layers.Dropout(0.4),
+            layers.Dense(200, activation='relu'),
+            layers.Dropout(0.4),
             layers.Dense(100, activation='relu'),
+            layers.Dropout(0.4),
             layers.Dense(9, activation='softmax'),
         ])
         self.q_eval = models.Sequential([
-            layers.Dense(200, input_shape = (10,) , activation='relu'),
+            layers.Dense(100, input_shape = (10,), activation='relu'),
+            layers.Dropout(0.4),
+            layers.Dense(200, activation='relu'),
+            layers.Dropout(0.4),
             layers.Dense(100, activation='relu'),
+            layers.Dropout(0.4),
             layers.Dense(9, activation='softmax'),
         ])
         self.q_target.compile(
@@ -48,6 +56,7 @@ class DeepQNetwork:
         replace_target_iter=300,
         memory_size=500,
         batch_size=32,
+        epsilon_start=0,
         e_greedy_increment=None,
         # output_graph=False,
     ):
@@ -65,7 +74,7 @@ class DeepQNetwork:
         self.memory_size = memory_size
         self.batch_size = batch_size
         self.epsilon_increment = e_greedy_increment
-        self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
+        self.epsilon = epsilon_start if e_greedy_increment is not None else self.epsilon_max
         
         # total learning step
         self.learn_step_counter = 0
@@ -90,7 +99,7 @@ class DeepQNetwork:
         input_data = np.array(board + [turn])[np.newaxis, :]
         if np.random.uniform() < self.epsilon:
             # print('predict')
-            actions_value = self.q_eval.predict(input_data)[0]
+            actions_value = self.q_eval.predict(input_data, verbose=0)[0]
             actions_list = np.argsort(actions_value)[::-1]
             
             # shuffle same value

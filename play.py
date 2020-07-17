@@ -14,12 +14,14 @@ def play():
             if observation[9] == 0:
                 # DQN 根据观测值选择行为
                 action = RL_0.choose_action(observation)
-                print('AI action:'+str(action+1))
+                print('AI_0 action:'+str(action+1))
                 # 环境根据行为给出下一个 state, reward, 是否终止
                 observation_, reward, done, _ = env.step(action)
 
             else:
-                action = int(input('')) - 1
+                action = RL_1.choose_action(observation)
+                print('AI_1 action:'+str(action+1))
+                # action = int(input('')) - 1
                 observation_, reward, done, _ = env.step(action)
 
             # # 将下一个 state_ 变为 下次循环的 state
@@ -30,6 +32,8 @@ def play():
                 env.render()
                 input('Press Enter to continue')
                 break
+            
+            time.sleep(0.5)
         
 if __name__ == '__main__':
     env = TTTEnv()
